@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -10,7 +11,11 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+    public TMP_Text ScoreText;
+
+    public TMP_Text finalScoreText;
+    public TMP_Text highScoreText;
+
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,7 +23,13 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+
+
+    public string MyTextArea;
+
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +47,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        highScoreText.text = PlayerPrefs.GetInt("SavedHighScore").ToString();
     }
 
     private void Update()
@@ -68,9 +81,41 @@ public class MainManager : MonoBehaviour
         ScoreText.text = $"Score : {m_Points}";
     }
 
+    public void HighScoreUpdate()
+    {
+        //Is there alreada highscore?
+        if (PlayerPrefs.HasKey("SavedHighScore"))
+        {
+            //is the new score higher than the saved one?
+            if(m_Points > PlayerPrefs.GetInt("SavedHighScore"))
+            {
+                //Set a new high score
+                PlayerPrefs.SetInt("SavedHighScore", m_Points);
+            }
+
+        }
+        else
+        {
+            //if there is no highschore... set it
+            PlayerPrefs.SetInt("SavedHighScore", m_Points);
+
+        }
+
+        //Update our TMP
+        finalScoreText.text = m_Points.ToString();
+        highScoreText.text = PlayerPrefs.GetInt("SavedHighScore").ToString();
+        
+    }
+
+   
+
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        // call the highscoreupdate
+        HighScoreUpdate();
+        
     }
 }
